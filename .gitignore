@@ -1,7 +1,3 @@
-# secrets
-.env
-.env.local
-
 # python
 backend/.venv/
 __pycache__/
