@@ -2,22 +2,26 @@
 
 import { useEffect, useRef, useState } from "react";
 import ResultChart from "../components/Chart";
+import ROLES from "./roles";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function Home() {
-  const [roles, setRoles] = useState({});
+  const [roles, setRoles] = useState(ROLES);
   const [role, setRole] = useState("Business Owner");
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef(null);
 
-  // Load the roles and their suggested questions from the backend
+  // Refresh the roles from the backend in case they changed there.
+  // If the backend can't be reached, the list in roles.js is used.
   useEffect(() => {
     fetch(`${API}/roles`)
-      .then((r) => r.json())
-      .then(setRoles)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data) setRoles(data);
+      })
       .catch(() => {});
   }, []);
 
@@ -93,7 +97,6 @@ export default function Home() {
         <label className="role-picker">
           I am the
           <select value={role} onChange={(e) => changeRole(e.target.value)}>
-            {Object.keys(roles).length === 0 && <option>{role}</option>}
             {Object.keys(roles).map((r) => (
               <option key={r}>{r}</option>
             ))}
